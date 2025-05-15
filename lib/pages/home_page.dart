@@ -13,10 +13,10 @@ class _HomePageState extends State<HomePage> {
   late Box<Map> _taskBox; // Hive box for storing tasks
   String? _newTaskContent; // For storing user input from the TextField
 
-  // Updated List: Includes "Do Laundry" and "Eat Pizza"
+  // Initial task list
   final List<Map<String, dynamic>> _tasks = [
     {"title": "Do Laundry", "completed": true},
-    {"title": "Eat Pizza", "completed": true}, // New task added here
+    {"title": "Eat Pizza", "completed": true},
   ];
 
   @override
@@ -96,7 +96,16 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: [
             TextButton(
-              child: const Text("Close"),
+              child: const Text("Add"),
+              onPressed: () {
+                if (_newTaskContent != null && _newTaskContent!.isNotEmpty) {
+                  _addTask(_newTaskContent!);
+                }
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text("Cancel"),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
@@ -105,5 +114,15 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
+  }
+
+  void _addTask(String content) {
+    final newTask = {
+      "title": content,
+      "completed": false, // New tasks are marked as not completed by default
+    };
+    setState(() {
+      _tasks.add(newTask); // Add the task to the list
+    });
   }
 }
