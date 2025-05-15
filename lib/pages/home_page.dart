@@ -13,9 +13,10 @@ class _HomePageState extends State<HomePage> {
   late Box<Map> _taskBox; // Hive box for storing tasks
   String? _newTaskContent; // For storing user input from the TextField
 
-  // Filtered List: Only the "Do Laundry" task
+  // Updated List: Includes "Do Laundry" and "Eat Pizza"
   final List<Map<String, dynamic>> _tasks = [
     {"title": "Do Laundry", "completed": true},
+    {"title": "Eat Pizza", "completed": true}, // New task added here
   ];
 
   @override
@@ -50,18 +51,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _tasksView() {
-    if (_taskBox == null) {
-      return const Center(
-        child: CircularProgressIndicator(), // Show loading indicator
-      );
-    }
-
-    if (_tasks.isEmpty) {
-      return const Center(
-        child: Text("No tasks available."),
-      );
-    }
-
     return ListView.builder(
       itemCount: _tasks.length,
       itemBuilder: (context, index) {
