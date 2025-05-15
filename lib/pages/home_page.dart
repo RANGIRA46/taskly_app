@@ -10,9 +10,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late double _deviceHeight, _deviceWidth;
 
-  // Use Dart's built-in DateTime for the current date
-  final String _currentDate =
-      "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
+  String? _newTaskContent; // For storing user input from the TextField
 
   // Example: List of tasks with completion status
   final List<Map<String, dynamic>> _tasks = [
@@ -55,19 +53,12 @@ class _HomePageState extends State<HomePage> {
               fontSize: 18,
             ),
           ),
-          subtitle: Text("Date: $_currentDate"), // Subtitle with current date
           trailing: Icon(
             task["completed"] ? Icons.check_box : Icons.check_box_outline_blank,
             color: task["completed"]
                 ? Colors.red
                 : Colors.grey, // Checkbox color changed to red for completed
           ),
-          onTap: () {
-            setState(() {
-              // Toggle the completion status of the task
-              task["completed"] = !task["completed"];
-            });
-          },
         );
       },
     );
@@ -75,11 +66,36 @@ class _HomePageState extends State<HomePage> {
 
   Widget _addTaskButton() {
     return FloatingActionButton(
-      onPressed: () {
-        // Action for adding a new task can go here
-      },
+      onPressed: _displayTaskPopup, // Display popup but won't add tasks
       child: const Icon(Icons.add),
       backgroundColor: Colors.red, // Set FloatingActionButton color to red
+    );
+  }
+
+  void _displayTaskPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Add Task"),
+          content: TextField(
+            decoration: const InputDecoration(hintText: "Enter task here"),
+            onChanged: (_value) {
+              setState(() {
+                _newTaskContent = _value; // Update input value, but no action taken
+              });
+            },
+          ),
+          actions: [
+            TextButton(
+              child: const Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
