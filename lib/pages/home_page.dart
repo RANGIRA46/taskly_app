@@ -65,9 +65,12 @@ class _HomePageState extends State<HomePage> {
               fontSize: 18,
             ),
           ),
-          trailing: Icon(
-            task["completed"] ? Icons.check_box : Icons.check_box_outline_blank,
-            color: task["completed"] ? Colors.red : Colors.grey, // Checkbox color
+          trailing: IconButton(
+            icon: Icon(
+              task["completed"] ? Icons.check_box : Icons.check_box_outline_blank,
+              color: task["completed"] ? Colors.red : Colors.grey, // Checkbox color
+            ),
+            onPressed: () => _toggleTaskCompletion(index), // Toggle task completion
           ),
         );
       },
@@ -123,6 +126,12 @@ class _HomePageState extends State<HomePage> {
     };
     setState(() {
       _tasks.add(newTask); // Add the task to the list
+    });
+  }
+
+  void _toggleTaskCompletion(int index) {
+    setState(() {
+      _tasks[index]["completed"] = !_tasks[index]["completed"]; // Toggle the completion status
     });
   }
 }
