@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,15 +10,25 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late double _deviceHeight, _deviceWidth;
-
+  late Box<Map> _taskBox; // Hive box for storing tasks
   String? _newTaskContent; // For storing user input from the TextField
 
-  // Example: List of tasks with completion status
+  // Filtered List: Only the "Do Laundry" task
   final List<Map<String, dynamic>> _tasks = [
     {"title": "Do Laundry", "completed": true},
-    {"title": "Eat Pizza", "completed": true},
-    {"title": "Complete Flutter Project", "completed": false},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeHive();
+  }
+
+  Future<void> _initializeHive() async {
+    await Hive.initFlutter(); // Initialize Hive
+    _taskBox = await Hive.openBox<Map>("tasks"); // Open the Hive box
+    setState(() {}); // Refresh the UI once Hive is initialized
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,12 +44,24 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
       ),
-      body: _taskslist(),
+      body: _tasksView(),
       floatingActionButton: _addTaskButton(),
     );
   }
 
-  Widget _taskslist() {
+  Widget _tasksView() {
+    if (_taskBox == null) {
+      return const Center(
+        child: CircularProgressIndicator(), // Show loading indicator
+      );
+    }
+
+    if (_tasks.isEmpty) {
+      return const Center(
+        child: Text("No tasks available."),
+      );
+    }
+
     return ListView.builder(
       itemCount: _tasks.length,
       itemBuilder: (context, index) {
@@ -55,9 +78,7 @@ class _HomePageState extends State<HomePage> {
           ),
           trailing: Icon(
             task["completed"] ? Icons.check_box : Icons.check_box_outline_blank,
-            color: task["completed"]
-                ? Colors.red
-                : Colors.grey, // Checkbox color changed to red for completed
+            color: task["completed"] ? Colors.red : Colors.grey, // Checkbox color
           ),
         );
       },
@@ -66,7 +87,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _addTaskButton() {
     return FloatingActionButton(
-      onPressed: _displayTaskPopup, // Display popup but won't add tasks
+      onPressed: _displayTaskPopup,
       child: const Icon(Icons.add),
       backgroundColor: Colors.red, // Set FloatingActionButton color to red
     );
@@ -81,9 +102,7 @@ class _HomePageState extends State<HomePage> {
           content: TextField(
             decoration: const InputDecoration(hintText: "Enter task here"),
             onChanged: (_value) {
-              setState(() {
-                _newTaskContent = _value; // Update input value, but no action taken
-              });
+              _newTaskContent = _value; // Update the task content
             },
           ),
           actions: [
